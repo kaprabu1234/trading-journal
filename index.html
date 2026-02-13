@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Trading Journal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+  <h2>Trading Journal</h2>
+
+  <label>Pair</label><br>
+  <select id="symbol">
+    <option value="GBPJPY">GBPJPY</option>
+    <option value="GBPUSD">GBPUSD</option>
+    <option value="EURUSD">EURUSD</option>
+    <option value="NASDAQ">NASDAQ</option>
+  </select>
+
+  <br><br>
+
+  <label>Entry</label><br>
+  <input type="number" id="entry" step="any">
+
+  <br><br>
+
+  <label>Stop Loss</label><br>
+  <input type="number" id="sl" step="any">
+
+  <br><br>
+
+  <label>Take Profit</label><br>
+  <input type="number" id="tp" step="any">
+
+  <br><br>
+
+  <button onclick="calculate()">Hitung RR</button>
+  <button onclick="saveTrade()">Simpan Trade</button>
+
+  <h3 id="result"></h3>
+
+  <hr>
+
+  <h3>Daftar Trade</h3>
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th>Pair</th>
+        <th>Risk</th>
+        <th>Reward</th>
+        <th>RR</th>
+      </tr>
+    </thead>
+    <tbody id="tradeList"></tbody>
+  </table>
+
+  <script src="app.js"></script>
+</body>
+</html>
