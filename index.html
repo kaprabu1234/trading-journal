@@ -4,80 +4,88 @@
   <meta charset="UTF-8">
   <title>Trading Journal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <div class="container">
+    <h1>Trading Journal</h1>
 
-<h2>Trading Journal</h2>
+    <div class="card">
+      <label>Tanggal</label>
+      <input type="date" id="date">
 
-<label>Tanggal</label><br>
-<input type="date" id="date"><br><br>
+      <label>Pair</label>
+      <select id="pair">
+        <option>GBPJPY</option>
+        <option>GBPUSD</option>
+        <option>EURUSD</option>
+        <option>NASDAQ</option>
+      </select>
 
-<label>Pair</label><br>
-<select id="symbol">
-  <option>GBPJPY</option>
-  <option>GBPUSD</option>
-  <option>EURUSD</option>
-  <option>NASDAQ</option>
-</select><br><br>
+      <label>Direction</label>
+      <select id="direction">
+        <option>Buy</option>
+        <option>Sell</option>
+      </select>
 
-<label>Direction</label><br>
-<select id="direction">
-  <option>Buy</option>
-  <option>Sell</option>
-</select><br><br>
+      <label>Entry</label>
+      <input type="number" id="entry">
 
-<label>Entry</label><br>
-<input type="number" id="entry" step="any"><br><br>
+      <label>Stop Loss</label>
+      <input type="number" id="sl">
 
-<label>Stop Loss</label><br>
-<input type="number" id="sl" step="any"><br><br>
+      <label>Take Profit</label>
+      <input type="number" id="tp">
 
-<label>Take Profit</label><br>
-<input type="number" id="tp" step="any"><br><br>
+      <label>Risk %</label>
+      <input type="number" id="risk">
 
-<label>Risk %</label><br>
-<input type="number" id="riskPercent" step="0.01"><br><br>
+      <label>Setup / Strategy</label>
+      <input type="text" id="strategy">
 
-<label>Setup / Strategy</label><br>
-<input type="text" id="strategy"><br><br>
+      <label>Session</label>
+      <select id="session">
+        <option>Asia</option>
+        <option>London</option>
+        <option>New York</option>
+      </select>
 
-<label>Session</label><br>
-<select id="session">
-  <option>Asia</option>
-  <option>London</option>
-  <option>New York</option>
-</select><br><br>
+      <label>Result</label>
+      <select id="result">
+        <option>Win</option>
+        <option>Loss</option>
+        <option>BE</option>
+      </select>
 
-<label>Result</label><br>
-<select id="resultTrade">
-  <option>Win</option>
-  <option>Loss</option>
-  <option>BE</option>
-</select><br><br>
+      <label>Notes</label>
+      <textarea id="notes"></textarea>
 
-<label>Notes</label><br>
-<textarea id="notes" rows="3"></textarea><br><br>
+      <button onclick="saveTrade()">Simpan Trade</button>
+    </div>
 
-<button onclick="saveTrade()">Simpan Trade</button>
+    <div class="card">
+      <h2>Trading History</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Pair</th>
+            <th>Dir</th>
+            <th>Risk%</th>
+            <th>RR</th>
+            <th>Result</th>
+            <th>Strategy</th>
+          </tr>
+        </thead>
+        <tbody id="history"></tbody>
+      </table>
+    </div>
+  </div>
 
-<hr>
-
-<h3>Trading History</h3>
-<table border="1" width="100%">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Pair</th>
-      <th>Dir</th>
-      <th>Risk%</th>
-      <th>RR</th>
-      <th>Result</th>
-      <th>Strategy</th>
-    </tr>
-  </thead>
-  <tbody id="tradeList"></tbody>
-</table>
-
-<script src="app.js"></script>
+  <!-- JS -->
+  <script src="app.js"></script>
 </body>
 </html>
