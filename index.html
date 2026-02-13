@@ -1,92 +1,88 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Trading Journal</title>
+  <title>Trading Journal Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <div class="container">
-    <h1>Trading Journal</h1>
 
-    <div class="card">
-      <label>Tanggal</label>
-      <input type="date" id="date">
+<div class="container">
+  <h1>📘 Trading Journal Pro</h1>
 
-      <label>Pair</label>
-      <select id="pair">
-        <option>GBPJPY</option>
-        <option>GBPUSD</option>
-        <option>EURUSD</option>
-        <option>NASDAQ</option>
-      </select>
-
-      <label>Direction</label>
-      <select id="direction">
-        <option>Buy</option>
-        <option>Sell</option>
-      </select>
-
-      <label>Entry</label>
-      <input type="number" id="entry">
-
-      <label>Stop Loss</label>
-      <input type="number" id="sl">
-
-      <label>Take Profit</label>
-      <input type="number" id="tp">
-
-      <label>Risk %</label>
-      <input type="number" id="risk">
-
-      <label>Setup / Strategy</label>
-      <input type="text" id="strategy">
-
-      <label>Session</label>
-      <select id="session">
-        <option>Asia</option>
-        <option>London</option>
-        <option>New York</option>
-      </select>
-
-      <label>Result</label>
-      <select id="result">
-        <option>Win</option>
-        <option>Loss</option>
-        <option>BE</option>
-      </select>
-
-      <label>Notes</label>
-      <textarea id="notes"></textarea>
-
-      <button onclick="saveTrade()">Simpan Trade</button>
-    </div>
-
-    <div class="card">
-      <h2>Trading History</h2>
-      <table class="table">
-        <thead>
-  <tr>
-    <th>Date</th>
-    <th>Pair</th>
-    <th>Dir</th>
-    <th>Risk%</th>
-    <th>RR</th>
-    <th>Result</th>
-    <th>Strategy</th>
-    <th>Action</th>
-  </tr>
-</thead>
-        <tbody id="history"></tbody>
-      </table>
-    </div>
+  <!-- BALANCE -->
+  <div class="card">
+    <h2>Balance</h2>
+    <p>Starting Balance: $<span id="startingBalance">5000</span></p>
+    <p>Current Equity: $<span id="equity">5000</span></p>
   </div>
 
-  <!-- JS -->
-  <script src="app.js"></script>
+  <!-- DEPOSIT / WITHDRAW -->
+  <div class="card">
+    <h2>Deposit / Withdraw</h2>
+    <input type="date" id="txDate">
+    <select id="txType">
+      <option value="deposit">Deposit</option>
+      <option value="withdraw">Withdraw</option>
+    </select>
+    <input type="number" id="txAmount" placeholder="Amount">
+    <button onclick="addTransaction()">Submit</button>
+  </div>
+
+  <!-- ADD TRADE -->
+  <div class="card">
+    <h2>Add / Edit Trade</h2>
+
+    <input type="date" id="date">
+    <select id="pair">
+      <option>GBPJPY</option>
+      <option>GBPUSD</option>
+      <option>EURUSD</option>
+      <option>NASDAQ</option>
+    </select>
+
+    <input type="number" id="lot" step="0.01" placeholder="Lot">
+    <input type="number" id="entry" step="0.0001" placeholder="Entry">
+    <input type="number" id="sl" step="0.0001" placeholder="Stop Loss">
+    <input type="number" id="tp" step="0.0001" placeholder="Take Profit">
+
+    <select id="result">
+      <option value="win">Win</option>
+      <option value="loss">Loss</option>
+    </select>
+
+    <div id="pnlPreview"></div>
+    <button onclick="saveTrade()">Save Trade</button>
+  </div>
+
+  <!-- EQUITY CURVE -->
+  <div class="card">
+    <h2>Equity Curve</h2>
+    <canvas id="equityChart"></canvas>
+  </div>
+
+  <!-- TRADE HISTORY -->
+  <div class="card">
+    <h2>Trade History</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Pair</th>
+          <th>Lot</th>
+          <th>PNL</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tradeTable"></tbody>
+    </table>
+
+    <button onclick="exportCSV()">Export CSV</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
