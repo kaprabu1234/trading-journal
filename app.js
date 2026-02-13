@@ -1,24 +1,31 @@
-let trades = JSON.parse(localStorage.getItem("trades")) || [];
-let editIndex = null;
+const CONTRACT = {
+  GBPJPY: 100000,
+  GBPUSD: 100000,
+  EURUSD: 100000,
+  NASDAQ: 20
+};
 
+let trades = JSON.parse(localStorage.getItem("trades")) || [];
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let startingBalance = 5000;
+let editIndex = null;
+let chart;
+
+// ===== PNL =====
+function calculatePNL(pair, entry, sl, tp, lot, result) {
+  const risk = Math.abs(entry - sl) * lot * CONTRACT[pair];
+  const reward = Math.abs(tp - entry) * lot * CONTRACT[pair];
+  return result === "win" ? reward : -risk;
+}
+
+// ===== SAVE / EDIT TRADE =====
 function saveTrade() {
   const trade = {
-    id: Date.now(),
     date: date.value,
     pair: pair.value,
-    direction: direction.value,
-    entry: entry.value,
-    sl: sl.value,
-    tp: tp.value,
-    risk: risk.value,
-    strategy: strategy.value,
-    result: result.value
+    lot: +lot.value,
+    pnl: calculatePNL(pair.value, +entry.value, +sl.value, +tp.value, +lot.value, result.value)
   };
-
-  if (!trade.entry || !trade.sl || !trade.tp) {
-    alert("Entry, SL, dan TP wajib diisi");
-    return;
-  }
 
   if (editIndex !== null) {
     trades[editIndex] = trade;
@@ -28,28 +35,100 @@ function saveTrade() {
   }
 
   localStorage.setItem("trades", JSON.stringify(trades));
-  renderTrades();
   clearForm();
+  renderAll();
 }
 
-function renderTrades() {
-  history.innerHTML = "";
+// ===== DELETE =====
+function deleteTrade(i) {
+  if (confirm("Delete trade?")) {
+    trades.splice(i, 1);
+    localStorage.setItem("trades", JSON.stringify(trades));
+    renderAll();
+  }
+}
 
+// ===== EDIT =====
+function editTrade(i) {
+  const t = trades[i];
+  editIndex = i;
+  date.value = t.date;
+  pair.value = t.pair;
+  lot.value = t.lot;
+}
+
+// ===== DEPOSIT / WITHDRAW =====
+function addTransaction() {
+  const tx = {
+    date: txDate.value,
+    type: txType.value,
+    amount: +txAmount.value
+  };
+
+  transactions.push(tx);
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+  renderAll();
+}
+
+// ===== EQUITY =====
+function calculateEquity() {
+  let equity = startingBalance;
+  transactions.forEach(t => equity += t.type === "deposit" ? t.amount : -t.amount);
+  trades.forEach(t => equity += t.pnl);
+  return equity;
+}
+
+// ===== EQUITY CURVE =====
+function drawEquityCurve() {
+  let equity = startingBalance;
+  const points = [];
+
+  transactions.forEach(t => {
+    equity += t.type === "deposit" ? t.amount : -t.amount;
+    points.push(equity);
+  });
+
+  trades.forEach(t => {
+    equity += t.pnl;
+    points.push(equity);
+  });
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(equityChart, {
+    type: "line",
+    data: {
+      labels: points.map((_, i) => i + 1),
+      datasets: [{ data: points, tension: 0.3 }]
+    },
+    options: { plugins: { legend: { display: false } } }
+  });
+}
+
+// ===== EXPORT CSV =====
+function exportCSV() {
+  let csv = "Date,Pair,Lot,PNL\n";
+  trades.forEach(t => {
+    csv += `${t.date},${t.pair},${t.lot},${t.pnl}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "trading_journal.csv";
+  link.click();
+}
+
+// ===== RENDER =====
+function renderAll() {
+  tradeTable.innerHTML = "";
   trades.forEach((t, i) => {
-    const rr = (
-      Math.abs(t.tp - t.entry) /
-      Math.abs(t.entry - t.sl)
-    ).toFixed(2);
-
-    history.innerHTML += `
+    tradeTable.innerHTML += `
       <tr>
         <td>${t.date}</td>
         <td>${t.pair}</td>
-        <td>${t.direction}</td>
-        <td>${t.risk}%</td>
-        <td>1:${rr}</td>
-        <td>${t.result}</td>
-        <td>${t.strategy}</td>
+        <td>${t.lot}</td>
+        <td style="color:${t.pnl > 0 ? '#22c55e' : '#ef4444'}">$${t.pnl.toFixed(2)}</td>
         <td>
           <button onclick="editTrade(${i})">✏️</button>
           <button onclick="deleteTrade(${i})">🗑</button>
@@ -57,33 +136,13 @@ function renderTrades() {
       </tr>
     `;
   });
-}
 
-function editTrade(index) {
-  const t = trades[index];
-  editIndex = index;
-
-  date.value = t.date;
-  pair.value = t.pair;
-  direction.value = t.direction;
-  entry.value = t.entry;
-  sl.value = t.sl;
-  tp.value = t.tp;
-  risk.value = t.risk;
-  strategy.value = t.strategy;
-  result.value = t.result;
-}
-
-function deleteTrade(index) {
-  if (confirm("Hapus trade ini?")) {
-    trades.splice(index, 1);
-    localStorage.setItem("trades", JSON.stringify(trades));
-    renderTrades();
-  }
+  equity.textContent = calculateEquity().toFixed(2);
+  drawEquityCurve();
 }
 
 function clearForm() {
-  document.querySelectorAll("input, textarea").forEach(i => i.value = "");
+  document.querySelectorAll("input").forEach(i => i.value = "");
 }
 
-renderTrades();
+renderAll();
