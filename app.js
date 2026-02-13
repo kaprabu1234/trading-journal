@@ -1,48 +1,39 @@
 const instruments = {
-  "GBPJPY": { point: 0.01 },
-  "GBPUSD": { point: 0.0001 },
-  "EURUSD": { point: 0.0001 },
-  "NASDAQ": { point: 1.0 }
+  GBPJPY: { point: 0.01 },
+  GBPUSD: { point: 0.0001 },
+  EURUSD: { point: 0.0001 },
+  NASDAQ: { point: 1 }
 };
 
-let lastResult = null;
-
-function calculate() {
-  const symbol = document.getElementById("symbol").value;
-  const entry  = parseFloat(document.getElementById("entry").value);
-  const sl     = parseFloat(document.getElementById("sl").value);
-  const tp     = parseFloat(document.getElementById("tp").value);
+function saveTrade() {
+  const entry = parseFloat(entryInput.value);
+  const sl = parseFloat(slInput.value);
+  const tp = parseFloat(tpInput.value);
 
   if (!entry || !sl || !tp) {
-    document.getElementById("result").innerText = "Lengkapi semua data";
+    alert("Harga belum lengkap");
     return;
   }
 
+  const symbol = symbolInput.value;
   const point = instruments[symbol].point;
 
-  const riskPoint   = Math.abs(entry - sl) / point;
-  const rewardPoint = Math.abs(tp - entry) / point;
-  const rr = rewardPoint / riskPoint;
+  const risk = Math.abs(entry - sl) / point;
+  const reward = Math.abs(tp - entry) / point;
+  const rr = (reward / risk).toFixed(2);
 
-  lastResult = {
+  const trade = {
+    date: dateInput.value,
     symbol,
-    risk: riskPoint.toFixed(1),
-    reward: rewardPoint.toFixed(1),
-    rr: rr.toFixed(2)
+    direction: direction.value,
+    riskPercent: riskPercent.value,
+    rr,
+    result: resultTrade.value,
+    strategy: strategy.value
   };
 
-  document.getElementById("result").innerText =
-    `Risk: ${lastResult.risk} | Reward: ${lastResult.reward} | RR = 1 : ${lastResult.rr}`;
-}
-
-function saveTrade() {
-  if (!lastResult) {
-    alert("Hitung RR dulu");
-    return;
-  }
-
   let trades = JSON.parse(localStorage.getItem("trades")) || [];
-  trades.push(lastResult);
+  trades.push(trade);
   localStorage.setItem("trades", JSON.stringify(trades));
 
   renderTrades();
@@ -50,21 +41,21 @@ function saveTrade() {
 
 function renderTrades() {
   const trades = JSON.parse(localStorage.getItem("trades")) || [];
-  const tbody = document.getElementById("tradeList");
-  tbody.innerHTML = "";
+  tradeList.innerHTML = "";
 
-  trades.forEach(trade => {
-    const row = `
+  trades.forEach(t => {
+    tradeList.innerHTML += `
       <tr>
-        <td>${trade.symbol}</td>
-        <td>${trade.risk}</td>
-        <td>${trade.reward}</td>
-        <td>1 : ${trade.rr}</td>
+        <td>${t.date}</td>
+        <td>${t.symbol}</td>
+        <td>${t.direction}</td>
+        <td>${t.riskPercent}%</td>
+        <td>1:${t.rr}</td>
+        <td>${t.result}</td>
+        <td>${t.strategy}</td>
       </tr>
     `;
-    tbody.innerHTML += row;
   });
 }
 
-// Jalan otomatis saat web dibuka
 renderTrades();
